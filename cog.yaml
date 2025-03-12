@@ -10,7 +10,7 @@ build:
     - "torch==2.4.1"
     - "torchvision==0.19.1"
     - "safetensors==0.4.4"
-    - "diffusers==0.30.0"
+    - "git+https://github.com/huggingface/diffusers.git"
     - "transformers==4.44.0"
     - "lycoris-lora==1.8.3"
     - "flatten_json==0.1.14"
@@ -56,7 +56,6 @@ build:
     - "Pygments==2.16.1"
   run:
     - curl -o /usr/local/bin/pget -L "https://github.com/replicate/pget/releases/download/v0.8.2/pget_linux_x86_64" && chmod +x /usr/local/bin/pget
-    - pip install "git+https://github.com/Gothos/diffusers.git@flux-inpaint"
     # - "pip install --force-reinstall --pre torch torchvision --index-url https://download.pytorch.org/whl/nightly/cu124"
     # - "pip install --force-reinstall --pre torch==2.5.0.dev20240905+cu124 torchvision==0.20.0.dev20240905+cu124 --index-url https://download.pytorch.org/whl/nightly/cu124"
 
