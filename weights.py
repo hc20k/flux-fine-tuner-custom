@@ -10,8 +10,10 @@ import time
 from collections import deque
 from io import BytesIO
 from pathlib import Path
+from typing import Optional
 
 import requests
+from huggingface_hub import snapshot_download
 
 DEFAULT_CACHE_BASE_DIR = Path("/src/weights-cache")
 
@@ -74,7 +76,16 @@ def download_weights(url: str, path: Path):
     download_weights_url(download_url, path)
 
 
-def download_weights_url(url: str, path: Path):
+def download_repo(repo_id: str, path: Path, hf_token: Optional[str] = None):
+    snapshot_download(
+        repo_id=repo_id,
+        local_dir=path,
+        local_dir_use_symlinks=False,
+        token=hf_token,
+    )
+
+
+def download_weights_url(url: str, path: Path, hf_token: Optional[str] = None):
     path = Path(path)
 
     print("Downloading weights")
@@ -88,6 +99,9 @@ def download_weights_url(url: str, path: Path):
         download_safetensors(url, path)
     elif url.endswith("/_weights"):
         download_safetensors_tarball(url, path)
+    elif not url.startswith("http") and url.count("/") == 1:
+        # HF repo
+        download_repo(url, path, hf_token)
     else:
         raise ValueError("URL must end with either .tar or .safetensors")
 

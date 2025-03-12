@@ -27,9 +27,9 @@ from jobs import BaseJob
 from toolkit.config import get_config
 
 from caption import Captioner
+from layer_match import available_layers_to_optimize, match_layers_to_optimize
 from wandb_client import WeightsAndBiasesClient, logout_wandb
-from layer_match import match_layers_to_optimize, available_layers_to_optimize
-
+from weights import download_weights_url
 
 JOB_NAME = "flux_train_replicate"
 WEIGHTS_PATH = Path("./FLUX.1-dev")
@@ -104,6 +104,10 @@ class TrainingOutput(BaseModel):
 def train(
     input_images: Path = Input(
         description="A zip file containing the images that will be used for training. We recommend a minimum of 10 images. If you include captions, include them as one .txt file per image, e.g. my-photo.jpg should have a caption file named my-photo.txt. If you don't include captions, you can use autocaptioning (enabled by default).",
+        default=None,
+    ),
+    weights_url: str = Input(
+        description="URL/Huggingface ID of the FLUX.1-dev weights. If not provided, the default weights will be used.",
         default=None,
     ),
     trigger_word: str = Input(
@@ -359,7 +363,13 @@ def train(
             name=wandb_run,
         )
 
-    download_weights()
+    if weights_url is not None:
+        download_weights()
+    else:
+        download_weights_url(
+            weights_url, WEIGHTS_PATH, hf_token=hf_token.get_secret_value()
+        )
+
     extract_zip(input_images, INPUT_DIR)
 
     if not trigger_word:
